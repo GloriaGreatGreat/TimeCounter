@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+  </head>
+
+  <style>
+    body {background-color: #FFF0F5;}
+    h1   {color: #C71585;font-family: Arial, Helvetica, sans-serif;}
+    h2   {color: #C71585;font-family: Arial, Helvetica, sans-serif;}
+    p    {color: #CD5C5C;font-family: Arial, Helvetica, sans-serif;}
+    span {color: #C71585;font-family: Arial, Helvetica, sans-serif;}
+    #wrap {
+      margin-left: auto;
+      margin-right: auto;
+      width:600px;
+    }
+    #middle_col {
+      margin-left: auto;
+      margin-right: auto;
+      width: 250px;
+    }
+    #left_col {
+      float:left;
+      width:300px;
+    }
+    #right_col {
+      float:right;
+      width:300px;
+    }
+  </style>
+
+  <body>
+    <div class="container">
+      <div id="wrap">
+        <div id="middle_col">
+        <form action="">
+          <h1>Count Target:<br><h1>
+          <input id="countTarget" type="text" name="countTarget"><br>
+          <input id="submit" type="button" value="Submit">
+        </form>
+      </div>
+      </div>
+      <div id="wrap">
+        <div id="left_col">
+          <form action="">
+            <h2>Stopwatch Control 1:</h2>
+            <p>Counting 1: <span id="dayUp"></span> Day <span id="hourUp"></span> Hour <span id="minUp"></span> Min <span id="secUp"></span> Sec</p>
+            <input id="pauseUp" type="button" value="Pause">
+            <input id="resetUp" type="button"  value="Reset">
+          </form>
+        </div>
+        <div id="right_col">
+          <form action="">
+            <h2>Stopwatch Control 2:</h2>
+            <p>Counting 2: <span id="dayDown"></span> Day <span id="hourDown"></span> Hour <span id="minDown"></span> Min <span id="secDown"></span> Sec</p>
+            <input id="pauseDown" type="button" value="Pause">
+            <input id="resetDown" type="button" value="Reset">
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // coded by YUJIA LI for intern challenge for ClickTime
+      var function_start = false; // bool for initial this function control, false: call start; true: call reset
+      var pause_up = false; // bool of ClockUp pause/resume control
+      var pause_down = false; // bool of ClockDown pause/resume control
+      var countTarget = 0; // integer of total time to count up/down
+
+      // stop watch one
+      var ClockUp = {
+        counts : 0,
+        start: function () {
+          var self = this;
+          this.interval = setInterval(function () {
+              if(self.counts < countTarget){
+                self.counts += 1;
+              }
+              $(document.getElementById('dayUp')).text(Math.floor(self.counts / 86400));
+              $(document.getElementById('hourUp')).text(Math.floor(self.counts / 3600 % 24));
+              $(document.getElementById('minUp')).text(Math.floor(self.counts / 60 % 60));
+              $(document.getElementById('secUp')).text(parseInt(self.counts % 60));
+            }, 1000);
+        },
+        pause: function () {
+          clearInterval(this.interval);
+          delete this.interval;
+        },
+        resume: function () {
+          if (!this.interval) this.start();
+        },
+        reset: function(){
+          clearInterval(this.interval);
+          this.start();
+        }
+      };
+
+      // stop watch two
+      var ClockDown = {
+        counts: 0,
+        start: function () {
+          var self = this;
+          this.interval = setInterval(function () {
+            if(self.counts > 0){
+              self.counts -= 1;
+            }
+            $(document.getElementById('dayDown')).text(Math.floor(self.counts / 86400));
+            $(document.getElementById('hourDown')).text(Math.floor(self.counts / 3600 % 24));
+            $(document.getElementById('minDown')).text(Math.floor(self.counts / 60 % 60));
+            $(document.getElementById('secDown')).text(parseInt(self.counts % 60));
+          }, 1000);
+        },
+        pause: function () {
+          clearInterval(this.interval);
+          delete this.interval;
+        },
+        resume: function () {
+          if (!this.interval) this.start();
+        },
+        reset: function(){
+          clearInterval(this.interval);
+          this.start();
+        }
+      };
+
+      // submit button control
+      $('#submit').click(function () {
+        countTarget = document.getElementById('countTarget').value;
+        if(!isNaN(countTarget)){
+          ClockUp.counts = 0;
+          ClockDown.counts = countTarget;
+          if(function_start == false){
+            function_start = true;
+            ClockUp.start();
+            ClockDown.start();
+          }
+          else{
+            ClockUp.reset();
+            ClockDown.reset();
+          }
+        }
+      });
+
+      // pause/resume button for stop watch one
+      $('#pauseUp').click(function () {
+        if(pause_up == false){
+          pause_up = true;
+          document.getElementById("pauseUp").value = "Resume";
+          ClockUp.pause();
+        }
+        else{
+          pause_up = false;
+          document.getElementById("pauseUp").value = "Pause";
+          ClockUp.resume();
+        }
+      });
+
+      // pause/resume button for stop watch two
+      $('#pauseDown').click(function () {
+        if(pause_down == false){
+          pause_down = true;
+          document.getElementById("pauseDown").value = "Resume";
+          ClockDown.pause();
+        }
+        else{
+          pause_down = false;
+          document.getElementById("pauseDown").value = "Pause";
+          ClockDown.resume();
+        }
+      });
+
+      // reset button for stop watch one
+      $('#resetUp').click(function () {
+        ClockUp.counts = 0;
+        ClockUp.reset();
+      });
+
+      // reset button for stop watch two
+      $('#resetDown').click(function () {
+        ClockDown.counts = countTarget;
+        ClockDown.reset();
+      });
+    </script>
+
+  </body>
+</html>
